@@ -2,8 +2,15 @@
 import { reactive, onMounted } from "vue";
 import * as Cesium from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
-import { tokTypes } from "@babel/parser";
- 
+
+function getUrl(name,matrix) {
+  const tianDiTuToken = "4402d5006797897fc5846f4a260540fa";
+  const TDT_URL = 'http://t{s}.tianditu.gov.cn/';
+  const TDT_LAYER = '/wmts?LAYER='
+  const TDT_MATRIX_SET = '&tileMatrixSet='
+  const TDT_PARAMETER = '&service=wmts&request=GetTile&version=1.0.0&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk='+tianDiTuToken;
+  return TDT_URL + name +"_"+ matrix + TDT_LAYER + name + TDT_MATRIX_SET + matrix + TDT_PARAMETER;
+} 
 const props = defineProps({
   viewStyle: {},
   viewerProperty: {},
@@ -14,17 +21,14 @@ const props = defineProps({
  
 onMounted(() => {
   const _this = this;
-  const tianDiTuToken = "4402d5006797897fc5846f4a260540fa";
-  const TDT_URL = 'http://t{s}.tianditu.gov.cn/';
+
   // 服务负载子域
   const subdomains = ["0", "1", "2", "3", "4", "5", "6", "7"];
   //c：经纬度投影;
   const TDT_MATRIX_C = "c"
   // w：球面墨卡托投影
   const TDT_MATRIX_W = "w"
-  const TDT_LAYER = '/wmts?LAYER='
-  const TDT_MATRIX_SET = '&tileMatrixSet='
-  const TDT_PARAMETER = '&service=wmts&request=GetTile&version=1.0.0&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk='+tianDiTuToken;
+  
   //影像地图
   var TDT_IMG = 'img'
   //影像中文标注
@@ -51,7 +55,7 @@ onMounted(() => {
     shadows: true, //是否显示背影
     imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
       // 矢量底图
-      url: TDT_URL + TDT_IMG +"_"+ TDT_MATRIX_C + TDT_LAYER + TDT_IMG + TDT_MATRIX_SET + TDT_MATRIX_C + TDT_PARAMETER,
+      url: getUrl(TDT_IMG,TDT_MATRIX_W),
       layer: "tdtVecLayer",
       style: "default",
       format: "tiles",
@@ -64,7 +68,7 @@ onMounted(() => {
   viewer.imageryLayers.addImageryProvider(
     new Cesium.WebMapTileServiceImageryProvider({
       //标注、路网
-      url: TDT_URL + TDT_CVA +"_"+ TDT_MATRIX_C + TDT_LAYER + TDT_CVA + TDT_MATRIX_SET + TDT_MATRIX_C + TDT_PARAMETER,
+      url: getUrl(TDT_CVA,TDT_MATRIX_W),
       layer: "tdtCiaLayer",
       style: "default",
       format: "tiles",
